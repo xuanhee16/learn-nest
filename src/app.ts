@@ -3,30 +3,43 @@ import { Cat, CatType } from "./app.model";
 
 const app: express.Express = express();
 
-//next로 미들웨어를 사용할 수 있다. -> 위치 상관없이 사용가능
+// logging middleware
 app.use((req, res, next) => {
   console.log(req.rawHeaders[1]);
   console.log("middleware");
   next();
 });
-app.get("/cats/som", (req, res, next) => {
-  console.log("som middleware");
-  next();
+
+// read 고양이 전체 데이터 조회
+app.get("/cats", (req, res) => {
+  try {
+    const cats = Cat;
+    throw new Error("db connect error");
+    res.status(200).send({ success: true, data: { cats } });
+  } catch (error: any) {
+    res.status(400).send({ success: false, error: error.message });
+  }
 });
 
-app.get("/", (req: express.Request, res: express.Response) => {
-  res.send({ cats: Cat });
+// read 특정 고양이 데이터 조회
+// 정적조회시 /cats/특정id값
+// 동적조회시 /cats/:id
+app.get("/cats/:id", (req, res) => {
+  try {
+    const params = req.params;
+    console.log(params);
+    // cats/fsduifh조회시
+    // 프론트에서 세션이나 쿠키, jwt 등으로 고양이(유저)의 id를 백으로 보내서 조회
+    // { id: 'fsduifh' }
+    const cat = Cat.find((cat) => {
+      return cat.id === params.id;
+    });
+    res.status(200).send({ success: true, data: { cat } });
+  } catch (error: any) {
+    res.status(400).send({ success: false, error: error.message });
+  }
 });
-app.get("/cats/blue", (req, res) => {
-  console.log(req.rawHeaders[1]);
-  res.send({ blue: Cat[0] });
-});
-app.get("/cats/som", (req, res) => {
-  console.log(req.rawHeaders[1]);
-  res.send({ som: Cat[1] });
-});
-
-//해당하는 라우터가 없을 때
+// 404 middleware
 app.use((req, res, next) => {
   console.log("error middleware");
   res.send({ error: "404 not found" });
