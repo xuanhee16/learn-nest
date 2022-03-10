@@ -74,6 +74,32 @@ router.put("/cats/:id", (req, res) => {
 });
 
 // update 고양이 데이터 부분적으로 업데이트 -> patch
+router.patch("/cats/:id", (req, res) => {
+  try {
+    const params = req.params;
+    const body = req.body;
+    let result;
+    Cat.forEach((cat) => {
+      if (cat.id === params.id) {
+        //구조분해할당으로 부분적 수정
+        //아이디가 fsduifh인 개체를 name만 수정할 때, body에 수정하고싶은 이름으로 보내면 /cats/fsduifh (patch) 해당 아이디의 네임이 수정된다.
+        cat = { ...cat, ...body };
+        result = cat;
+      }
+    });
+    res.status(200).send({
+      success: true,
+      data: {
+        cat: result,
+      },
+    });
+  } catch (error: any) {
+    res.status(400).send({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 
 // delete 고양이 데이터 삭제 -> delete
 export default router;
