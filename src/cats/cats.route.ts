@@ -3,7 +3,7 @@ import { Router } from "express";
 
 const router = Router(); //app 대신에 router인스턴스를 만들고 router 등록
 
-// read 고양이 전체 데이터 조회
+// read 고양이 전체 데이터 조회 -> get
 router.get("/cats", (req, res) => {
   try {
     const cats = Cat;
@@ -13,13 +13,13 @@ router.get("/cats", (req, res) => {
   }
 });
 
-// read 특정 고양이 데이터 조회
+// read 특정 고양이 데이터 조회 -> get
 // 정적조회시 /cats/특정id값
 // 동적조회시 /cats/:id
 router.get("/cats/:id", (req, res) => {
   try {
     const params = req.params;
-    console.log(params);
+    // console.log(params);
     // cats/fsduifh조회시
     // 프론트에서 세션이나 쿠키, jwt 등으로 고양이(유저)의 id를 백으로 보내서 조회
     // { id: 'fsduifh' }
@@ -32,7 +32,7 @@ router.get("/cats/:id", (req, res) => {
   }
 });
 
-// 새로운 고양이 추가(새로운 데이터 추가시)
+// create 새로운 고양이 추가(새로운 데이터 추가시) -> post
 router.post("/cats", (req, res) => {
   try {
     const data = req.body;
@@ -47,4 +47,33 @@ router.post("/cats", (req, res) => {
   }
 });
 
+// update 고양이 데이터 업데이트 -> put
+router.put("/cats/:id", (req, res) => {
+  try {
+    const params = req.params;
+    const body = req.body;
+    let result;
+    Cat.forEach((cat) => {
+      if (cat.id === params.id) {
+        cat = body;
+        result = cat;
+      }
+    });
+    res.status(200).send({
+      success: true,
+      data: {
+        cat: result,
+      },
+    });
+  } catch (error: any) {
+    res.status(400).send({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// update 고양이 데이터 부분적으로 업데이트 -> patch
+
+// delete 고양이 데이터 삭제 -> delete
 export default router;
