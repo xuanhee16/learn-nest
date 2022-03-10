@@ -102,4 +102,20 @@ router.patch("/cats/:id", (req, res) => {
 });
 
 // delete 고양이 데이터 삭제 -> delete
+router.delete("/cats/:id", (req, res) => {
+  try {
+    const params = req.params;
+    //각 원소에 cat.id와 params.id가 다른 경우를 필터링해서 나타냄 -> 기존에 있던 id가 없어짐 -> 새로운 데이터로
+    const newCat = Cat.filter((cat) => cat.id !== params.id);
+    res.status(200).send({
+      success: true,
+      data: newCat,
+    });
+  } catch (error: any) {
+    res.status(400).send({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 export default router;
